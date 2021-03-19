@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{%block bodyblock %}
+
+        <div class="container">
+            <br><br>
+            <h3 class="content"> Welcome to <span style="color:#198b90">Dual Core Face Recognition System</span></h3>
+        <br>
+            <p>
+                Dual Core is a data driven company. We use our techology for widespread public benefit,
+                and collaborate with others on critcal challenges.
+            </p>
+            <br><br>
+            <p class="content">
+                Gender Classification: This app is driven by data and machine learning model.
+                As soon as user upload the image, in background it convert into grayscale, crop face, convert into eigen image and 
+                finally it model to predict. All this functionality dumped in the flask app.
+            </p>
+
+            <br>
+            <div align="center">
+                <img src="{{ url_for('static',filename='images/002.PNG') }}" alt="" width="600" height="230" >
+            </div>
+            
+            <br>
+        </div>
+
+{% endblock  %}

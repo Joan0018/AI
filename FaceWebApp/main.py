@@ -12,6 +12,7 @@ app.add_url_rule('/genderClassificationRealTime/openGenderRealTime','openGenderR
 app.add_url_rule('/objectDetection','objectDetection',views.objectDetection, methods=['GET','POST'])
 app.add_url_rule('/realTimeObject','realTimeObject',views.realTimeObject, methods=['GET','POST'])
 app.add_url_rule('/realTimeObject/openRealTime','openRealTime',views.openRealTime,  methods=['GET','POST'])
+app.add_url_rule('/objectVideo','object_Video',views.object_Video,  methods=['GET','POST'])
 
 # RUN
 if __name__=="__main__":

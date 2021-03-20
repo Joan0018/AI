@@ -12,61 +12,64 @@
     <link rel="stylesheet" href="{{ url_for('static',filename='css/main.css') }}">
     <title>Dual Core FRS</title>
 </head>
-<body>
 
+<body>
     <div class="container">
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <a class="navbar-brand" href="{{ url_for('index') }}">
                 <img src="{{url_for('static',filename='images/logo_title.png')}}" alt="" width="50" height="50">
                 <img src="{{url_for('static',filename='images/test.png')}}" alt="" width="150" height="30">
-
             </a>
+
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
               <span class="navbar-toggler-icon"></span>
             </button>
-              <div class="collapse navbar-collapse" id="navbarNavDropdown">
-                <ul class="navbar-nav">
-                  <li class="nav-item active">
-                    <a class="nav-link" href="{{ url_for('index') }}">Home <span class="sr-only">(current)</span></a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('objectDetection') }}">Object Detection</a>
-                  </li>
-                  <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Gender Classification
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                      <a class="dropdown-item" href="{{ url_for('gender') }}">Upload Image</a>
-                      <a class="dropdown-item" href="{{ url_for('gender_Video') }}">Upload Video</a>
-                      <a class="dropdown-item" href="{{ url_for('openGenderRealTime') }}">Real Time Detection</a>
+
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+              <ul class="navbar-nav">
+                <li class="nav-item active">
+                  <a class="nav-link" href="{{ url_for('index') }}">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navBarDropdownObjectDetection" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      Object Detection
+                  </a>
+                    <div class="dropdown-menu" aria-labelledby="navBarDropdownObjectDetection">
+                        <a class="dropdown-item" href="{{ url_for('objectDetection') }}">Upload Image</a>
+                        <a class="dropdown-item" href="{{ url_for('object_Video') }}">Upload Video</a>
+                        <a class="dropdown-item" href="{{ url_for('openRealTime') }}">Real Time</a>
                     </div>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </nav>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Gender Classification
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="{{ url_for('gender') }}">Upload Image</a>
+                   <a class="dropdown-item" href="{{ url_for('gender_Video') }}">Upload Video</a>
+                    <a class="dropdown-item" href="{{ url_for('openGenderRealTime') }}">Real Time Detection</a>
+                  </div>
+              </li>
+            </ul>
+          </div>
+      </nav>
     </div>
 
     {% block bodyblock %}
 
-        
-
     {% endblock %}
 
-
-
     <!-- footer -->
-    <footer class="footer">
-        <div class="container">
-            <!-- <img src="{{ url_for('static', filename='images/logo.png') }}" alt="" width="100" height="100"> -->
-            <p align="center">
-                <span style="color:white">
-                    copyrights Dual Core FRS.Space
-                </span>
-                </p>
-        </div>
-    </footer>
+<!--    <footer class="footer">-->
+<!--        <div class="container">-->
+<!--            &lt;!&ndash; <img src="{{ url_for('static', filename='images/logo.png') }}" alt="" width="100" height="100"> &ndash;&gt;-->
+<!--            <p align="center">-->
+<!--                <span style="color:white">-->
+<!--                    copyrights Dual Core FRS.Space-->
+<!--                </span>-->
+<!--                </p>-->
+<!--        </div>-->
+<!--    </footer>-->
     
 <style>
     .footer{

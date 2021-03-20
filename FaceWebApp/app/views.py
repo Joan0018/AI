@@ -1,12 +1,9 @@
-from datetime import time
-
-import cv2
 from flask import render_template, request, Response
 import os
 from PIL import Image
-from app.utils import pipeline_model, mobileNetImageDetection, mobileNetRealTimeDetection, videoCapture, genderRealTimeDetection
+from app.utils import pipeline_model, mobileNetImageDetection, mobileRealTimeDetection, videoCapture, genderRealTimeDetection, mobileNetVideoDetection
 
-UPLOAD_FLODER = 'static/uploads'
+UPLOAD_FOLDER = 'static/uploads'
 
 
 def base():
@@ -28,19 +25,24 @@ def getwidth(path):
     w = 300 * aspect
     return int(w)
 
+
+def openRealTime():
+    return render_template('realTimeDetection.html')
+
+
 def gender_Real():
     return Response(genderRealTimeDetection(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+
 def genderRealTime():
     return render_template('realTimeGender.html')
-
 
 
 def gender():
     if request.method == "POST":
         f = request.files['image']
         filename = f.filename
-        path = os.path.join(UPLOAD_FLODER, filename)
+        path = os.path.join(UPLOAD_FOLDER, filename)
         f.save(path)
         w = getwidth(path)
 
@@ -51,11 +53,12 @@ def gender():
 
     return render_template('gender.html', fileupload=False, img_name="gender.png")
 
+
 def gender_Video():
     if request.method == "POST":
         f = request.files['video']
         filename = f.filename
-        path = os.path.join(UPLOAD_FLODER, filename)
+        path = os.path.join(UPLOAD_FOLDER, filename)
         f.save(path)
 
         # prediction (pass to pipeline model)
@@ -65,12 +68,13 @@ def gender_Video():
 
     return render_template('genderVideo.html', fileupload=False, img_name="gender.png")
 
+
 def objectDetection():
     if request.method == "POST":
         if request.form['submit_button'] == "upload & predict":
             f = request.files['image']
             filename = f.filename
-            path = os.path.join(UPLOAD_FLODER, filename)
+            path = os.path.join(UPLOAD_FOLDER, filename)
             f.save(path)
             w = getwidth(path)
 
@@ -85,10 +89,21 @@ def objectDetection():
     return render_template('objectDetection.html', fileupload=False, img_name="objectDetection.png")
 
 
-def openRealTime():
-    return render_template('realTimeDetection.html')
+def object_Video():
+    if request.method == "POST":
+        f = request.files['video']
+        filename = f.filename
+        path = os.path.join(UPLOAD_FOLDER, filename)
+        f.save(path)
+
+        # mobileNetDetection(path, 'Video')
+        mobileNetVideoDetection(path)
+
+        return render_template('objectDetectionVideo.html', fileupload=True)
+
+    return render_template('objectDetectionVideo.html', fileupload=False)
 
 
 def realTimeObject():
     # call mobilenet
-    return Response(mobileNetRealTimeDetection(), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(mobileRealTimeDetection(), mimetype='multipart/x-mixed-replace; boundary=frame')

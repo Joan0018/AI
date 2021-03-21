@@ -78,10 +78,12 @@ def objectDetection():
             f.save(path)
             w = getwidth(path)
 
-            # call mobilenet
-            mobileNetImageDetection(path, filename)
+            # get the extension of image
+            imgExtension = filename.split('.')[1]
 
-            return render_template('objectDetection.html', fileupload=True, img_name=filename, w=w)
+            # call mobilenet
+            detectedObject = mobileNetImageDetection(path, filename) + '.' + imgExtension
+            return render_template('objectDetection.html', fileupload=True, img_name=filename, detected_name=detectedObject, w=w)
         else:
             # realTimeObject()
             openRealTime()

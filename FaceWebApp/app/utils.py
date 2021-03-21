@@ -1,11 +1,14 @@
 import time
 
-import numpy as np
 # import pandas as pd
 # import matplotlib.pyplot as plt
 import sklearn
 import pickle
 import cv2
+import os
+import pathlib
+
+OBJECT_IMAGE_EXPORT_PATH = 'static/object_detected/image/'
 
 # Model for gender Classification
 haar = cv2.CascadeClassifier('./model/haarcascade_frontalface_default.xml')
@@ -144,6 +147,9 @@ def genderRealTimeDetection():
 
 # Object Detection
 def mobileNetImageDetection(path, filename):
+    # use for return the image name
+    imgName = filename.split('.')[0]
+
     thres = 0.45  # Threshold to detect object
 
     classNames = []
@@ -154,12 +160,13 @@ def mobileNetImageDetection(path, filename):
     net = initNet()
 
     img = cv2.imread(path)
-
     classIds, confs, bbox = net.detect(img, confThreshold=thres)
 
     if len(classIds) != 0:
         for classId, confidence, box in zip(classIds.flatten(), confs.flatten(), bbox):
+
             if confidence >= 0.5:
+
                 cv2.rectangle(img, box, color=(0, 255, 0), thickness=2)
 
                 if (box[2] - box[0]) < 400:
@@ -168,6 +175,7 @@ def mobileNetImageDetection(path, filename):
 
                     cv2.putText(img, str(round(confidence * 100, 2)), (box[0] + 120, box[1] + 30),
                                 cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 1)
+
                 else:
                     cv2.putText(img, classNames[classId - 1].upper(), (box[0] + 10, box[1] + 30),
                                 cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1)
@@ -175,7 +183,14 @@ def mobileNetImageDetection(path, filename):
                     cv2.putText(img, str(round(confidence * 100, 2)), (box[0] + 200, box[1] + 30),
                                 cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1)
 
-    cv2.imwrite('./static/predict/{}'.format(filename), img)
+                imgName = imgName + '_' + classNames[classId - 1].capitalize() + '_' + str(
+                    round(confidence * 100, 2)) + '%'
+
+                exportImage = os.path.join(
+                    os.path.join(pathlib.Path().parent.absolute(), OBJECT_IMAGE_EXPORT_PATH, imgName + '.jpg'))
+                cv2.imwrite(exportImage, img)
+
+    return imgName
 
 
 def mobileRealTimeDetection():

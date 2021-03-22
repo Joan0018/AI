@@ -85,6 +85,9 @@ def faceRecognition_Video():
 def face_Real():
     return Response(faceRecognitionReal(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+def faceRealTime():
+    return render_template('realTimeFace.html')
+
 def objectDetection():
     if request.method == "POST":
         if request.form['submit_button'] == "upload & predict":

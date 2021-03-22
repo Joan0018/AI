@@ -455,16 +455,8 @@ def faceRecognitionReal():
             font = cv2.FONT_HERSHEY_DUPLEX
             cv2.putText(current_frame, name_of_person, (left_pos,bottom_pos), font, 0.5, (255,255,255),1)
         
-        #display the video
-        cv2.imshow("Webcam Video",current_frame)
-        
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-
-    #release the stream and cam
-    #close all opencv windows open
-    webcam_video_stream.release()
-    cv2.destroyAllWindows()       
+        img = cv2.imencode('.jpg', current_frame)[1].tobytes()
+        yield b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n'
 
 # Object Detection
 def mobileNetImageDetection(path, filename):

@@ -1,7 +1,7 @@
 from flask import render_template, request, Response
 import os
 from PIL import Image
-from app.utils import pipeline_model, mobileNetImageDetection, mobileRealTimeDetection, videoCapture, genderRealTimeDetection, mobileNetVideoDetection
+from app.utils import pipeline_model, mobileNetImageDetection, mobileRealTimeDetection, videoCapture, genderRealTimeDetection, mobileNetVideoDetection, faceRecognitionImage, faceRecognitionVideo, faceRecognitionReal
 
 UPLOAD_FOLDER = 'static/uploads'
 
@@ -68,6 +68,22 @@ def gender_Video():
 
     return render_template('genderVideo.html', fileupload=False, img_name="gender.png")
 
+def faceRecognition_Video():
+    if request.method == "POST":
+        f = request.files['video']
+        filename = f.filename
+        path = os.path.join(UPLOAD_FOLDER, filename)
+        f.save(path)
+
+        # prediction (pass to pipeline model)
+        faceRecognitionVideo(path)
+
+        return render_template('FaceRecognitionVideo.html', fileupload=True)
+
+    return render_template('FaceRecognitionVideo.html', fileupload=False, img_name="face.png")
+
+def face_Real():
+    return Response(faceRecognitionReal(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 def objectDetection():
     if request.method == "POST":
@@ -89,7 +105,6 @@ def objectDetection():
             openRealTime()
 
     return render_template('objectDetection.html', fileupload=False, img_name="objectDetection.png")
-
 
 def object_Video():
     if request.method == "POST":

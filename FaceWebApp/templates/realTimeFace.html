@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block bodyblock %}
+
+<div class="container">
+    <h3>Real Time Face Recognition</h3>
+</div>
+
+<div align="center">
+    <img src="{{ url_for('faceRecognition') }}">
+</div>
+
+<br>
+
+<div align="center">
+    <a class="btn btn-outline-primary" href="{{ url_for('index') }}">Back to Homepage</a>
+</div>
+
+{% endblock %}

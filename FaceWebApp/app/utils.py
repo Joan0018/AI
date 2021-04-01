@@ -9,10 +9,15 @@ import pickle
 import cv2
 import face_recognition
 import pathlib
+import xlsxwriter
+from openpyxl import load_workbook
 
+# Export image of object
 OBJECT_IMAGE_EXPORT_PATH = 'static/object_detected/image/'
+
 # Model for gender Classification
 haar = cv2.CascadeClassifier('./model/haarcascade_frontalface_default.xml')
+
 # pickle files
 mean = pickle.load(open('./model/mean_preprocess.pickle', 'rb'))
 model_svm = pickle.load(open('./model/model_svm.pickle', 'rb'))
@@ -481,6 +486,8 @@ def mobileNetImageDetection(path, filename):
     img = cv2.imread(path)
     classIds, confs, bbox = net.detect(img, confThreshold=thres)
 
+    # createWorkBook()
+
     if len(classIds) != 0:
         for classId, confidence, box in zip(classIds.flatten(), confs.flatten(), bbox):
 
@@ -529,6 +536,15 @@ def mobileRealTimeDetection():
     starting_time = time.time()
     frame_id = 0
 
+    wb = load_workbook('ObjectDetected.xlsx')
+    sheet = wb.worksheets[0]
+    print("Clearing Data")
+    while sheet.max_row > 1:
+        # this method removes the row 2
+        sheet.delete_rows(2)
+        wb.save('ObjectDetected.xlsx')
+    print("Data Cleared")
+
     while True:
         success, img = cap.read()
         img = cv2.resize(img, (0, 0), fx=1.05, fy=1.0)
@@ -555,6 +571,11 @@ def mobileRealTimeDetection():
                         cv2.putText(img, str(round(confidence * 100, 2)), (box[0] + 200, box[1] + 30),
                                     cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1)
 
+                    # Append detected object into excel file
+                    objectDetected = (classNames[classId - 1].capitalize(), round(confidence * 100, 2))
+                    sheet.append(objectDetected)
+                    wb.save('ObjectDetected.xlsx')
+
         elapsed_time = time.time() - starting_time
         fps = frame_id / elapsed_time
         cv2.putText(img, "FPS: " + str(round(fps, 2)), (10, 50), font, 2, (0, 0, 0), 3)
@@ -577,6 +598,15 @@ def mobileNetVideoDetection(path):
         classNames = f.read().rstrip('\n').split('\n')
 
     net = initNet()
+
+    wb = load_workbook('ObjectDetected.xlsx')
+    sheet = wb.worksheets[0]
+    print("Clearing Data")
+    while sheet.max_row > 1:
+        # this method removes the row 2
+        sheet.delete_rows(2)
+        wb.save('ObjectDetected.xlsx')
+    print("Data Cleared")
 
     while cap.isOpened:
         success, img = cap.read()
@@ -605,6 +635,11 @@ def mobileNetVideoDetection(path):
                             cv2.putText(img, str(round(confidence * 100, 2)), (box[0] + 200, box[1] + 30),
                                         cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1)
 
+                        # Append detected object into excel file
+                        objectDetected = (classNames[classId - 1].capitalize(), round(confidence * 100, 2))
+                        sheet.append(objectDetected)
+                        wb.save('ObjectDetected.xlsx')
+
             cv2.imshow("Output", img)
             if cv2.waitKey(1) & 0xFF == ord('s'):  # press s to exit  --#esc key (27),
                 break
@@ -626,3 +661,14 @@ def initNet():
     net.setInputSwapRB(True)
 
     return net
+
+
+# Need to manually create by add method to the code
+def createWorkBook():
+    if not os.path.isfile('ObjectDetected.xlsx'):
+        objectDetectedBook = xlsxwriter.Workbook('ObjectDetected.xlsx')
+        objectSheet = objectDetectedBook.add_worksheet()
+        objectSheet.write(0, 0, 'Object Detected')
+        objectSheet.write(0, 1, 'Percentage')
+
+        objectDetectedBook.close()

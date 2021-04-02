@@ -15,8 +15,9 @@ from openpyxl import load_workbook
 # Export image of object
 OBJECT_IMAGE_EXPORT_PATH = 'static/object_detected/image/'
 
-# Model for gender Classification
-haar = cv2.CascadeClassifier('./model/haarcascade_frontalface_default.xml')
+# Model for face Detection
+cascPathface = os.path.dirname(cv2.__file__) + "/data/haarcascade_frontalface_alt2.xml"
+haar = cv2.CascadeClassifier(cascPathface)
 
 # pickle files
 mean = pickle.load(open('./model/mean_preprocess.pickle', 'rb'))
@@ -34,6 +35,7 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 def pipeline_model(path, filename, color='bgr'):
     name = faceRecognitionImage(path)
 
+
     # step-1: read image in cv2
     img = cv2.imread(path)
 
@@ -46,7 +48,7 @@ def pipeline_model(path, filename, color='bgr'):
     # step-3: crop the face (using haar cascase classifier)
     faces = haar.detectMultiScale(gray, 1.5, 3)
     for x, y, w, h in faces:
-        cv2.rectangle(img, (x, y), (x + w, y + h), (255, 255, 0), 2)  # drawing rectangle
+        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)  # drawing rectangle
         roi = gray[y:y + h, x:x + w]  # crop image
 
         # step - 4: normalization (0-1)
@@ -74,13 +76,19 @@ def pipeline_model(path, filename, color='bgr'):
         predict = results.argmax()  # 0 or 1
         score = results[predict]
 
+        # Get the height and width for image for put text
+        imageWidth = img.shape[1]
+        imageHeight = img.shape[0]
         # step -11:
         text = " %s : %0.2f" % (gender_pre[predict], score)
         txtName = "%s" % (name)
-        cv2.putText(img, text, (x, y), font, 1, (255, 255, 0), 1)
-        cv2.putText(img, txtName, (x, y + w), font, 1, (255, 255, 0), 1)
+        scale = 1 # this value can be from 0 to 1 (0,1] to change the size of the text relative to the image
+        fontScale = min(imageWidth,imageHeight)/(25/scale)
+        cv2.putText(img, text, (x, y), font, 1, (255, 255, 0), 2)
+        cv2.putText(img, txtName, (x, y + w), font, 1, (255, 255, 0), 2, cv2.LINE_AA)
 
     cv2.imwrite('./static/predict/{}'.format(filename), img)
+   
 
 
 # Gender Classification (Video)
@@ -161,21 +169,100 @@ def faceRecognitionImage(path):
     original_image = cv2.imread(path)
 
     # #load the sample images and get the 128 face embeddings from them
-    modi_image = face_recognition.load_image_file('images/modi.jpg')
-    modi_face_encodings = face_recognition.face_encodings(modi_image)[0]
+    # Face #1
+    Benedict_Cumberbatch_image = face_recognition.load_image_file('images/New Sample/Benedict_Cumberbatch.jpg')
+    Benedict_Cumberbatch_face_encodings = face_recognition.face_encodings(Benedict_Cumberbatch_image)[0]
 
-    trump_image = face_recognition.load_image_file('images/trump.jpg')
-    trump_face_encodings = face_recognition.face_encodings(trump_image)[0]
+    #Face #2
+    Beyonce_image = face_recognition.load_image_file('images/New Sample/Beyonce.jpg')
+    Beyonce_face_encodings = face_recognition.face_encodings(Beyonce_image)[0]
 
-    joan_image = face_recognition.load_image_file('images/Joan.jpg')
-    joan_face_encodings = face_recognition.face_encodings(joan_image)[0]
-
+    #Face #3
     lim_image = face_recognition.load_image_file('images/Lim.jpeg')
-    lim_face_encodings = face_recognition.face_encodings(joan_image)[0]
+    lim_face_encodings = face_recognition.face_encodings(lim_image)[0]
+
+    #Face #4
+    Brie_Larson_image = face_recognition.load_image_file('images/New Sample/Brie_Larson.jpg')
+    Brie_Larson_encodings = face_recognition.face_encodings(Brie_Larson_image)[0]
+
+    #Face #5
+    Calum_Scott_image = face_recognition.load_image_file('images/New Sample/Calum  Scott.jpeg')
+    Calum_Scott_encodings = face_recognition.face_encodings(Calum_Scott_image)[0]
+
+    #Face #6
+    Chris_Hemsworth_image = face_recognition.load_image_file('images/New Sample/Chris Hemsworth.jpg')
+    Chris_Hemsworth_encodings = face_recognition.face_encodings(Chris_Hemsworth_image)[0]
+
+    #Face #7
+    Chris_Hemsworth_image = face_recognition.load_image_file('images/New Sample/Chris Pratt.jpg')
+    Chris_Hemsworth_encodings = face_recognition.face_encodings(Chris_Hemsworth_image)[0]
+
+    #Face #8
+    Ed_Sheeran_image = face_recognition.load_image_file('images/New Sample/Ed Sheeran.png')
+    Ed_Sheeran_encodings = face_recognition.face_encodings(Ed_Sheeran_image)[0]
+
+    #Face #9
+    Evangeline_Lilly_image = face_recognition.load_image_file('images/New Sample/Evangeline_Lilly.jpg')
+    Evangeline_Lilly_encodings = face_recognition.face_encodings(Evangeline_Lilly_image)[0]
+
+    #Face #10
+    Hailey_Rhode_Bieber_image = face_recognition.load_image_file('images/New Sample/Hailey Rhode Bieber.jpg')
+    Hailey_Rhode_Bieber_encodings = face_recognition.face_encodings(Hailey_Rhode_Bieber_image)[0]
+
+    #Face #11
+    justin_bieber_image = face_recognition.load_image_file('images/New Sample/justin bieber.jpg')
+    justin_bieber_encodings = face_recognition.face_encodings(justin_bieber_image)[0]
+
+    #Face #12
+    lisa_image = face_recognition.load_image_file('images/New Sample/lisa.png')
+    lisa_encodings = face_recognition.face_encodings(lisa_image)[0]
+    
+    #Face #13
+    Mahershala_Ali_image = face_recognition.load_image_file('images/New Sample/Mahershala_Ali.jpg')
+    Mahershala_Ali_encodings = face_recognition.face_encodings(Mahershala_Ali_image)[0]
+
+    #Face #14
+    Paul_Rudd_image = face_recognition.load_image_file('images/New Sample/Paul_Rudd.jpg')
+    Paul_Rudd_encodings = face_recognition.face_encodings(Paul_Rudd_image)[0]    
+
+    #Face #14
+    Paul_Rudd_image = face_recognition.load_image_file('images/New Sample/Richard_Madden.jpg')
+    Paul_Rudd_encodings = face_recognition.face_encodings(Paul_Rudd_image)[0]   
+
+    #Face #15
+    Ryan_Reynolds_image = face_recognition.load_image_file('images/New Sample/Ryan_Reynolds.jpg')
+    Ryan_Reynolds_encodings = face_recognition.face_encodings(Ryan_Reynolds_image)[0]    
+
+    #Face #16
+    Scarlett_Johansson_image = face_recognition.load_image_file('images/New Sample/Scarlett Johansson.jpg')
+    Scarlett_Johansson_encodings = face_recognition.face_encodings(Scarlett_Johansson_image)[0]  
+
+    #Face #17
+    Simu_Liu_image = face_recognition.load_image_file('images/New Sample/Simu_Liu.jpg')
+    Simu_Liu_encodings = face_recognition.face_encodings(Simu_Liu_image)[0]
+
+    #Face #18
+    taylor_swift_image = face_recognition.load_image_file('images/New Sample/taylor-swift.jpg')
+    taylor_swift_encodings = face_recognition.face_encodings(taylor_swift_image)[0]    
+
+    #Face #19
+    the_rock_image = face_recognition.load_image_file('images/New Sample/the-rock.jpg')
+    the_rock_encodings = face_recognition.face_encodings(the_rock_image)[0]
+
+    #Face #19
+    Tom_Holland_image = face_recognition.load_image_file('images/New Sample/Tom_Holland.jpg')
+    Tom_Holland_encodings = face_recognition.face_encodings(Tom_Holland_image)[0]
 
     # #save the encodings and the corresponding labels in seperate arrays in the same order
-    known_face_encodings = [modi_face_encodings, trump_face_encodings, lim_face_encodings, joan_face_encodings]
-    known_face_names = ["Narendra Modi", "Donald Trump", "Lim Kah Yee", "Joan Hau"]
+    known_face_encodings = [Benedict_Cumberbatch_face_encodings, Beyonce_face_encodings, lim_face_encodings,
+    Brie_Larson_encodings, Calum_Scott_encodings, Chris_Hemsworth_encodings, Ed_Sheeran_encodings, Evangeline_Lilly_encodings, 
+    Hailey_Rhode_Bieber_encodings, justin_bieber_encodings, lisa_encodings, Mahershala_Ali_encodings,
+    Paul_Rudd_encodings, Ryan_Reynolds_encodings, Scarlett_Johansson_encodings, Simu_Liu_encodings, taylor_swift_encodings,
+    the_rock_encodings, Tom_Holland_encodings]
+    known_face_names = ["Benedict Cumberbatch", "Beyonce", "Lim Kah Yee", 
+    "Brie Larson", "Calum Scott", "Chris Hemsworth", "Ed Sheeran", "Evangeline Lilly",
+    "Hailey Rhode Bieber", "Justin Bieber", "Lisa", " Mahershala Ali", "Paul Rudd",
+    "Ryan Reynolds", "Scarlett Johansson", "Simu Liu", "Taylor Swift", "Johnson Dwayne", "Tom Holland"]
 
     # #load the unknown image to recognize faces in it
     image_to_recognize = face_recognition.load_image_file(path)
@@ -216,118 +303,101 @@ def faceRecognitionVideo(path):
     file_video_stream = cv2.VideoCapture(path)
 
     # load the sample images and get the 128 face embeddings from them
-    # FACE #1
-    aaron_Peirsol_image = face_recognition.load_image_file('images/samples/Aaron_Peirsol.jpg')
-    aaron_Peirsol_face_encodings = face_recognition.face_encodings(aaron_Peirsol_image)[0]
+     # Face #1
+    Benedict_Cumberbatch_image = face_recognition.load_image_file('images/New Sample/Benedict_Cumberbatch.jpg')
+    Benedict_Cumberbatch_face_encodings = face_recognition.face_encodings(Benedict_Cumberbatch_image)[0]
 
-    # FACE #2
-    aaron_Sorkin_image = face_recognition.load_image_file('images/samples/Aaron_Sorkin.jpg')
-    aaron_Sorkin_face_encodings = face_recognition.face_encodings(aaron_Sorkin_image)[0]
+    #Face #2
+    Beyonce_image = face_recognition.load_image_file('images/New Sample/Beyonce.jpg')
+    Beyonce_face_encodings = face_recognition.face_encodings(Beyonce_image)[0]
 
-    # FACE #3
-    abdel_Nasser_Assidi_image = face_recognition.load_image_file('images/samples/Abdel_Nasser_Assidi.jpg')
-    abdel_Nasser_Assidi_face_encodings = face_recognition.face_encodings(abdel_Nasser_Assidi_image)[0]
-
-    # FACE #4
-    abdullah_image = face_recognition.load_image_file('images/samples/Abdullah.jpg')
-    abdullah_face_encodings = face_recognition.face_encodings(abdullah_image)[0]
-
-    # FACE #5
-    trump_image = face_recognition.load_image_file('images/samples/trump.jpg')
-    trump_face_encodings = face_recognition.face_encodings(trump_image)[0]
-
-    # FACE #6
-    abel_Pacheco_image = face_recognition.load_image_file('images/samples/Abel_Pacheco.jpg')
-    abel_Pacheco_face_encodings = face_recognition.face_encodings(abel_Pacheco_image)[0]
-
-    # FACE #7
-    adam_Sandler_image = face_recognition.load_image_file('images/samples/Adam_Sandler.jpg')
-    adam_Sandler_face_encodings = face_recognition.face_encodings(adam_Sandler_image)[0]
-
-    # FACE #8
-    adam_Scott_image = face_recognition.load_image_file('images/samples/Adam_Scott.jpg')
-    adam_Scott_face_encodings = face_recognition.face_encodings(adam_Scott_image)[0]
-
-    # FACE #9
-    adolfo_Aguilar_Zinser_image = face_recognition.load_image_file('images/samples/Adolfo_Aguilar_Zinser.jpg')
-    adolfo_Aguilar_Zinser_face_encodings = face_recognition.face_encodings(adolfo_Aguilar_Zinser_image)[0]
-
-    # FACE #10
-    ahmed_Chalabi_image = face_recognition.load_image_file('images/samples/Ahmed_Chalabi.jpg')
-    ahmed_Chalabi_face_encodings = face_recognition.face_encodings(ahmed_Chalabi_image)[0]
-
-    # FACE #11
-    ai_Sugiyama_image = face_recognition.load_image_file('images/samples/Ai_Sugiyama.jpg')
-    ai_Sugiyama_face_encodings = face_recognition.face_encodings(ai_Sugiyama_image)[0]
-
-    # FACE #12
-    aicha_El_Ouafi_image = face_recognition.load_image_file('images/samples/Aicha_El_Ouafi.jpg')
-    aicha_El_Ouafi_face_encodings = face_recognition.face_encodings(aicha_El_Ouafi_image)[0]
-
-    # FACE #13
-    akbar_Hashemi_Rafsanjani_image = face_recognition.load_image_file('images/samples/Akbar_Hashemi_Rafsanjani.jpg')
-    akbar_Hashemi_Rafsanjani_face_encodings = face_recognition.face_encodings(akbar_Hashemi_Rafsanjani_image)[0]
-
-    # FACE #14
-    akhmed_Zakayev_image = face_recognition.load_image_file('images/samples/Akhmed_Zakayev.jpg')
-    akhmed_Zakayev_face_encodings = face_recognition.face_encodings(akhmed_Zakayev_image)[0]
-
-    # FACE #15
-    al_Gore_image = face_recognition.load_image_file('images/samples/Al_Gore.jpg')
-    al_Gore_face_encodings = face_recognition.face_encodings(al_Gore_image)[0]
-
-    # FACE #16
-    alan_Ball_image = face_recognition.load_image_file('images/samples/Alan_Ball.jpg')
-    alan_Ball_face_encodings = face_recognition.face_encodings(alan_Ball_image)[0]
-
-    # FACE #17
-    alberto_Fujimori_image = face_recognition.load_image_file('images/samples/Alberto_Fujimori.jpg')
-    alberto_Fujimori_face_encodings = face_recognition.face_encodings(alberto_Fujimori_image)[0]
-
-    # FACE #18
-    alberto_Ruiz_Gallardon_image = face_recognition.load_image_file('images/samples/Alberto_Ruiz_Gallardon.jpg')
-    alberto_Ruiz_Gallardon_face_encodings = face_recognition.face_encodings(alberto_Ruiz_Gallardon_image)[0]
-
-    # FACE #19
-    albrecht_Mentz_image = face_recognition.load_image_file('images/samples/Albrecht_Mentz.jpg')
-    albrecht_Mentz_face_encodings = face_recognition.face_encodings(albrecht_Mentz_image)[0]
-
-    # FACE #20
-    alec_Baldwin_image = face_recognition.load_image_file('images/samples/Alec_Baldwin.jpg')
-    alec_Baldwin_face_encodings = face_recognition.face_encodings(alec_Baldwin_image)[0]
-
-    # FACE #21
-    modi_image = face_recognition.load_image_file('images/modi.jpg')
-    modi_face_encodings = face_recognition.face_encodings(modi_image)[0]
-
-    # FACE #22
-    joan_image = face_recognition.load_image_file('images/Joan.jpg')
-    joan_face_encodings = face_recognition.face_encodings(joan_image)[0]
-
-    # FACE #23
+    #Face #3
     lim_image = face_recognition.load_image_file('images/Lim.jpeg')
-    lim_face_encodings = face_recognition.face_encodings(joan_image)[0]
+    lim_face_encodings = face_recognition.face_encodings(lim_image)[0]
 
-    # save the encodings and the corresponding labels in seperate arrays in the same order
-    known_face_encodings = [lim_face_encodings, joan_face_encodings, aaron_Peirsol_face_encodings,
-                            aaron_Sorkin_face_encodings, abdel_Nasser_Assidi_face_encodings,
-                            abdullah_face_encodings, trump_face_encodings,
-                            abel_Pacheco_face_encodings, adam_Sandler_face_encodings, adam_Scott_face_encodings,
-                            adolfo_Aguilar_Zinser_face_encodings, ahmed_Chalabi_face_encodings,
-                            ai_Sugiyama_face_encodings,
-                            aicha_El_Ouafi_face_encodings, akbar_Hashemi_Rafsanjani_face_encodings,
-                            akhmed_Zakayev_face_encodings,
-                            al_Gore_face_encodings, alan_Ball_face_encodings, alberto_Fujimori_face_encodings,
-                            alberto_Ruiz_Gallardon_face_encodings, albrecht_Mentz_face_encodings,
-                            alec_Baldwin_face_encodings,
-                            modi_face_encodings]
-    known_face_names = ["Lim Kah Yee", "Joan Hau", "Aaron Peirsol", "Aaron Sorkin", "Abdel Nasser Assidi",
-                        "Abdullah", "Donald John Trump", "Abel Pacheco",
-                        "Adam Sandler", "Adam Scott", "Adolfo Aguilar Zinser",
-                        "Ahmed Chalabi", "Ai Sugiyama", "Aicha El Ouafi",
-                        "Akbar Hashemi Rafsanjani", "Akhmed Zakayev", "Al Gore",
-                        "Alan Ball", "Alberto Fujimori", "Alberto Ruiz Gallardon",
-                        "Albrecht Mentz", "Alec Baldwin", "Narendra Modi"]
+    #Face #4
+    Brie_Larson_image = face_recognition.load_image_file('images/New Sample/Brie_Larson.jpg')
+    Brie_Larson_encodings = face_recognition.face_encodings(Brie_Larson_image)[0]
+
+    #Face #5
+    Calum_Scott_image = face_recognition.load_image_file('images/New Sample/Calum  Scott.jpeg')
+    Calum_Scott_encodings = face_recognition.face_encodings(Calum_Scott_image)[0]
+
+    #Face #6
+    Chris_Hemsworth_image = face_recognition.load_image_file('images/New Sample/Chris Hemsworth.jpg')
+    Chris_Hemsworth_encodings = face_recognition.face_encodings(Chris_Hemsworth_image)[0]
+
+    #Face #7
+    Chris_Hemsworth_image = face_recognition.load_image_file('images/New Sample/Chris Pratt.jpg')
+    Chris_Hemsworth_encodings = face_recognition.face_encodings(Chris_Hemsworth_image)[0]
+
+    #Face #8
+    Ed_Sheeran_image = face_recognition.load_image_file('images/New Sample/Ed Sheeran.png')
+    Ed_Sheeran_encodings = face_recognition.face_encodings(Ed_Sheeran_image)[0]
+
+    #Face #9
+    Evangeline_Lilly_image = face_recognition.load_image_file('images/New Sample/Evangeline_Lilly.jpg')
+    Evangeline_Lilly_encodings = face_recognition.face_encodings(Evangeline_Lilly_image)[0]
+
+    #Face #10
+    Hailey_Rhode_Bieber_image = face_recognition.load_image_file('images/New Sample/Hailey Rhode Bieber.jpg')
+    Hailey_Rhode_Bieber_encodings = face_recognition.face_encodings(Hailey_Rhode_Bieber_image)[0]
+
+    #Face #11
+    justin_bieber_image = face_recognition.load_image_file('images/New Sample/justin bieber.jpg')
+    justin_bieber_encodings = face_recognition.face_encodings(justin_bieber_image)[0]
+
+    #Face #12
+    lisa_image = face_recognition.load_image_file('images/New Sample/lisa.png')
+    lisa_encodings = face_recognition.face_encodings(lisa_image)[0]
+    
+    #Face #13
+    Mahershala_Ali_image = face_recognition.load_image_file('images/New Sample/Mahershala_Ali.jpg')
+    Mahershala_Ali_encodings = face_recognition.face_encodings(Mahershala_Ali_image)[0]
+
+    #Face #14
+    Paul_Rudd_image = face_recognition.load_image_file('images/New Sample/Paul_Rudd.jpg')
+    Paul_Rudd_encodings = face_recognition.face_encodings(Paul_Rudd_image)[0]    
+
+    #Face #14
+    Paul_Rudd_image = face_recognition.load_image_file('images/New Sample/Richard_Madden.jpg')
+    Paul_Rudd_encodings = face_recognition.face_encodings(Paul_Rudd_image)[0]   
+
+    #Face #15
+    Ryan_Reynolds_image = face_recognition.load_image_file('images/New Sample/Ryan_Reynolds.jpg')
+    Ryan_Reynolds_encodings = face_recognition.face_encodings(Ryan_Reynolds_image)[0]    
+
+    #Face #16
+    Scarlett_Johansson_image = face_recognition.load_image_file('images/New Sample/Scarlett Johansson.jpg')
+    Scarlett_Johansson_encodings = face_recognition.face_encodings(Scarlett_Johansson_image)[0]  
+
+    #Face #17
+    Simu_Liu_image = face_recognition.load_image_file('images/New Sample/Simu_Liu.jpg')
+    Simu_Liu_encodings = face_recognition.face_encodings(Simu_Liu_image)[0]
+
+    #Face #18
+    taylor_swift_image = face_recognition.load_image_file('images/New Sample/taylor-swift.jpg')
+    taylor_swift_encodings = face_recognition.face_encodings(taylor_swift_image)[0]    
+
+    #Face #19
+    the_rock_image = face_recognition.load_image_file('images/New Sample/the-rock.jpg')
+    the_rock_encodings = face_recognition.face_encodings(the_rock_image)[0]
+
+    #Face #19
+    Tom_Holland_image = face_recognition.load_image_file('images/New Sample/Tom_Holland.jpg')
+    Tom_Holland_encodings = face_recognition.face_encodings(Tom_Holland_image)[0]
+
+    # #save the encodings and the corresponding labels in seperate arrays in the same order
+    known_face_encodings = [Benedict_Cumberbatch_face_encodings, Beyonce_face_encodings, lim_face_encodings,
+    Brie_Larson_encodings, Calum_Scott_encodings, Chris_Hemsworth_encodings, Ed_Sheeran_encodings, Evangeline_Lilly_encodings, 
+    Hailey_Rhode_Bieber_encodings, justin_bieber_encodings, lisa_encodings, Mahershala_Ali_encodings,
+    Paul_Rudd_encodings, Ryan_Reynolds_encodings, Scarlett_Johansson_encodings, Simu_Liu_encodings, taylor_swift_encodings,
+    the_rock_encodings, Tom_Holland_encodings]
+    known_face_names = ["Benedict Cumberbatch", "Beyonce", "Lim Kah Yee", 
+    "Brie Larson", "Calum Scott", "Chris Hemsworth", "Ed Sheeran", "Evangeline Lilly",
+    "Hailey Rhode Bieber", "Justin Bieber", "Lisa", " Mahershala Ali", "Paul Rudd",
+    "Ryan Reynolds", "Scarlett Johansson", "Simu Liu", "Taylor Swift", "Johnson Dwayne", "Tom Holland"]
+
 
     # initialize the array variable to hold all face locations, encodings and names
     all_face_locations = []
@@ -374,11 +444,11 @@ def faceRecognitionVideo(path):
                     first_match_index = all_matches.index(True)
                     name_of_person = known_face_names[first_match_index]
                 # draw rectangle around the face
-            cv2.rectangle(current_frame, (left_pos, top_pos), (right_pos, bottom_pos), (0, 255, 0), 2)
+                cv2.rectangle(current_frame, (left_pos, top_pos), (right_pos, bottom_pos), (0, 255, 0), 2)
 
-            # display the name as text in the image
-            font = cv2.FONT_HERSHEY_DUPLEX
-            cv2.putText(current_frame, name_of_person, (left_pos, bottom_pos), font, 1, (255, 255, 0), 1)
+                # display the name as text in the image
+                font = cv2.FONT_HERSHEY_DUPLEX
+                cv2.putText(current_frame, name_of_person, (left_pos, bottom_pos), font, 1, (255, 255, 0), 1)
 
             # display the video
             cv2.imshow("Webcam Video", current_frame)
@@ -398,22 +468,102 @@ def faceRecognitionReal():
     # capture the video from default camera
     webcam_video_stream = cv2.VideoCapture(0)
 
-    # load the sample images and get the 128 face embeddings from them
-    modi_image = face_recognition.load_image_file('images/samples/modi.jpg')
-    modi_face_encodings = face_recognition.face_encodings(modi_image)[0]
+    # Face #1
+    Benedict_Cumberbatch_image = face_recognition.load_image_file('images/New Sample/Benedict_Cumberbatch.jpg')
+    Benedict_Cumberbatch_face_encodings = face_recognition.face_encodings(Benedict_Cumberbatch_image)[0]
 
-    trump_image = face_recognition.load_image_file('images/samples/trump.jpg')
-    trump_face_encodings = face_recognition.face_encodings(trump_image)[0]
+    #Face #2
+    Beyonce_image = face_recognition.load_image_file('images/New Sample/Beyonce.jpg')
+    Beyonce_face_encodings = face_recognition.face_encodings(Beyonce_image)[0]
 
-    joan_image = face_recognition.load_image_file('images/samples/Joan.jpg')
-    joan_face_encodings = face_recognition.face_encodings(joan_image)[0]
 
+    #Face #3
     lim_image = face_recognition.load_image_file('images/Lim.jpeg')
     lim_face_encodings = face_recognition.face_encodings(lim_image)[0]
 
-    # save the encodings and the corresponding labels in seperate arrays in the same order
-    known_face_encodings = [modi_face_encodings, trump_face_encodings, lim_face_encodings, joan_face_encodings]
-    known_face_names = ["Narendra Modi", "Donald Trump", "Lim Kah Yee", "Joan Hau"]
+    #Face #4
+    Brie_Larson_image = face_recognition.load_image_file('images/New Sample/Brie_Larson.jpg')
+    Brie_Larson_encodings = face_recognition.face_encodings(Brie_Larson_image)[0]
+
+    #Face #5
+    Calum_Scott_image = face_recognition.load_image_file('images/New Sample/Calum  Scott.jpeg')
+    Calum_Scott_encodings = face_recognition.face_encodings(Calum_Scott_image)[0]
+
+    #Face #6
+    Chris_Hemsworth_image = face_recognition.load_image_file('images/New Sample/Chris Hemsworth.jpg')
+    Chris_Hemsworth_encodings = face_recognition.face_encodings(Chris_Hemsworth_image)[0]
+
+    #Face #7
+    Chris_Hemsworth_image = face_recognition.load_image_file('images/New Sample/Chris Pratt.jpg')
+    Chris_Hemsworth_encodings = face_recognition.face_encodings(Chris_Hemsworth_image)[0]
+
+    #Face #8
+    Ed_Sheeran_image = face_recognition.load_image_file('images/New Sample/Ed Sheeran.png')
+    Ed_Sheeran_encodings = face_recognition.face_encodings(Ed_Sheeran_image)[0]
+
+    #Face #9
+    Evangeline_Lilly_image = face_recognition.load_image_file('images/New Sample/Evangeline_Lilly.jpg')
+    Evangeline_Lilly_encodings = face_recognition.face_encodings(Evangeline_Lilly_image)[0]
+
+    #Face #10
+    Hailey_Rhode_Bieber_image = face_recognition.load_image_file('images/New Sample/Hailey Rhode Bieber.jpg')
+    Hailey_Rhode_Bieber_encodings = face_recognition.face_encodings(Hailey_Rhode_Bieber_image)[0]
+
+    #Face #11
+    justin_bieber_image = face_recognition.load_image_file('images/New Sample/justin bieber.jpg')
+    justin_bieber_encodings = face_recognition.face_encodings(justin_bieber_image)[0]
+
+    #Face #12
+    lisa_image = face_recognition.load_image_file('images/New Sample/lisa.png')
+    lisa_encodings = face_recognition.face_encodings(lisa_image)[0]
+    
+    #Face #13
+    Mahershala_Ali_image = face_recognition.load_image_file('images/New Sample/Mahershala_Ali.jpg')
+    Mahershala_Ali_encodings = face_recognition.face_encodings(Mahershala_Ali_image)[0]
+
+    #Face #14
+    Paul_Rudd_image = face_recognition.load_image_file('images/New Sample/Paul_Rudd.jpg')
+    Paul_Rudd_encodings = face_recognition.face_encodings(Paul_Rudd_image)[0]    
+
+    #Face #14
+    Paul_Rudd_image = face_recognition.load_image_file('images/New Sample/Richard_Madden.jpg')
+    Paul_Rudd_encodings = face_recognition.face_encodings(Paul_Rudd_image)[0]   
+
+    #Face #15
+    Ryan_Reynolds_image = face_recognition.load_image_file('images/New Sample/Ryan_Reynolds.jpg')
+    Ryan_Reynolds_encodings = face_recognition.face_encodings(Ryan_Reynolds_image)[0]    
+
+    #Face #16
+    Scarlett_Johansson_image = face_recognition.load_image_file('images/New Sample/Scarlett Johansson.jpg')
+    Scarlett_Johansson_encodings = face_recognition.face_encodings(Scarlett_Johansson_image)[0]  
+
+    #Face #17
+    Simu_Liu_image = face_recognition.load_image_file('images/New Sample/Simu_Liu.jpg')
+    Simu_Liu_encodings = face_recognition.face_encodings(Simu_Liu_image)[0]
+
+    #Face #18
+    taylor_swift_image = face_recognition.load_image_file('images/New Sample/taylor-swift.jpg')
+    taylor_swift_encodings = face_recognition.face_encodings(taylor_swift_image)[0]    
+
+    #Face #19
+    the_rock_image = face_recognition.load_image_file('images/New Sample/the-rock.jpg')
+    the_rock_encodings = face_recognition.face_encodings(the_rock_image)[0]
+
+    #Face #19
+    Tom_Holland_image = face_recognition.load_image_file('images/New Sample/Tom_Holland.jpg')
+    Tom_Holland_encodings = face_recognition.face_encodings(Tom_Holland_image)[0]
+
+    # #save the encodings and the corresponding labels in seperate arrays in the same order
+    known_face_encodings = [Benedict_Cumberbatch_face_encodings, Beyonce_face_encodings, lim_face_encodings,
+    Brie_Larson_encodings, Calum_Scott_encodings, Chris_Hemsworth_encodings, Ed_Sheeran_encodings, Evangeline_Lilly_encodings, 
+    Hailey_Rhode_Bieber_encodings, justin_bieber_encodings, lisa_encodings, Mahershala_Ali_encodings,
+    Paul_Rudd_encodings, Ryan_Reynolds_encodings, Scarlett_Johansson_encodings, Simu_Liu_encodings, taylor_swift_encodings,
+    the_rock_encodings, Tom_Holland_encodings]
+    known_face_names = ["Benedict Cumberbatch", "Beyonce", "Lim Kah Yee", 
+    "Brie Larson", "Calum Scott", "Chris Hemsworth", "Ed Sheeran", "Evangeline Lilly",
+    "Hailey Rhode Bieber", "Justin Bieber", "Lisa", " Mahershala Ali", "Paul Rudd",
+    "Ryan Reynolds", "Scarlett Johansson", "Simu Liu", "Taylor Swift", "Johnson Dwayne", "Tom Holland"]
+
 
     # initialize the array variable to hold all face locations, encodings and names
     all_face_locations = []

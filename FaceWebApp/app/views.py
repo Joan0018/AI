@@ -22,7 +22,7 @@ def genderClassification():
 def getwidth(path):
     img = Image.open(path)
     size = img.size  # width and height
-    aspect = size[0] / size[1]  # width / height
+    aspect = size[0]/size[1] # width / height
     w = 300 * aspect
     return int(w)
 
@@ -33,7 +33,6 @@ def openRealTime():
 
 def gender_Real():
     return Response(genderRealTimeDetection(), mimetype='multipart/x-mixed-replace; boundary=frame')
-
 
 def genderRealTime():
     return render_template('realTimeGender.html')
@@ -46,7 +45,7 @@ def gender():
         path = os.path.join(UPLOAD_FOLDER, filename)
         f.save(path)
         w = getwidth(path)
-
+       
         # prediction (pass to pipeline model)
         pipeline_model(path, filename, color='bgr')
 

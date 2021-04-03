@@ -11,6 +11,7 @@ import face_recognition
 import pathlib
 import xlsxwriter
 from openpyxl import load_workbook
+import HandTrackingModule as htm
 
 # Export image of object
 OBJECT_IMAGE_EXPORT_PATH = 'static/object_detected/image/'
@@ -643,8 +644,6 @@ def mobileNetImageDetection(path, filename):
     img = cv2.imread(path)
     classIds, confs, bbox = net.detect(img, confThreshold=thres)
 
-    # createWorkBook()
-
     if len(classIds) != 0:
         for classId, confidence, box in zip(classIds.flatten(), confs.flatten(), bbox):
 
@@ -676,71 +675,6 @@ def mobileNetImageDetection(path, filename):
     return imgName
 
 
-def mobileRealTimeDetection():
-    thres = 0.45  # Threshold to detect object
-
-    cap = cv2.VideoCapture(0)
-
-    classNames = []
-    classFile = 'mobileNet/coco.names'
-    with open(classFile, 'rt') as f:
-        classNames = f.read().rstrip('\n').split('\n')
-
-    net = initNet()
-
-    # fps
-    font = cv2.FONT_HERSHEY_PLAIN
-    starting_time = time.time()
-    frame_id = 0
-
-    wb = load_workbook('ObjectDetected.xlsx')
-    sheet = wb.worksheets[0]
-    print("Clearing Data")
-    while sheet.max_row > 1:
-        # this method removes the row 2
-        sheet.delete_rows(2)
-        wb.save('ObjectDetected.xlsx')
-    print("Data Cleared")
-
-    while True:
-        success, img = cap.read()
-        img = cv2.resize(img, (0, 0), fx=1.05, fy=1.0)
-
-        frame_id += 1
-
-        classIds, confs, bbox = net.detect(img, confThreshold=thres)
-
-        if len(classIds) != 0:
-            for classId, confidence, box in zip(classIds.flatten(), confs.flatten(), bbox):
-                if confidence >= 0.5:
-                    cv2.rectangle(img, box, color=(0, 255, 0), thickness=2)
-
-                    if (box[2] - box[0]) < 400:
-                        cv2.putText(img, classNames[classId - 1].upper(), (box[0] + 10, box[1] + 30),
-                                    cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 1)
-
-                        cv2.putText(img, str(round(confidence * 100, 2)), (box[0] + 120, box[1] + 30),
-                                    cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 255, 0), 1)
-                    else:
-                        cv2.putText(img, classNames[classId - 1].upper(), (box[0] + 10, box[1] + 30),
-                                    cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1)
-
-                        cv2.putText(img, str(round(confidence * 100, 2)), (box[0] + 200, box[1] + 30),
-                                    cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1)
-
-                    # Append detected object into excel file
-                    objectDetected = (classNames[classId - 1].capitalize(), round(confidence * 100, 2))
-                    sheet.append(objectDetected)
-                    wb.save('ObjectDetected.xlsx')
-
-        elapsed_time = time.time() - starting_time
-        fps = frame_id / elapsed_time
-        cv2.putText(img, "FPS: " + str(round(fps, 2)), (10, 50), font, 2, (0, 0, 0), 3)
-
-        frame = cv2.imencode('.jpg', img)[1].tobytes()
-        yield b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n'
-
-
 def mobileNetVideoDetection(path):
     thres = 0.45
     cap = cv2.VideoCapture(path)
@@ -755,6 +689,8 @@ def mobileNetVideoDetection(path):
         classNames = f.read().rstrip('\n').split('\n')
 
     net = initNet()
+
+    createWorkBook()
 
     wb = load_workbook('ObjectDetected.xlsx')
     sheet = wb.worksheets[0]
@@ -805,6 +741,119 @@ def mobileNetVideoDetection(path):
 
     cap.release()
     cv2.destroyAllWindows()
+
+
+# Finger Images
+folderPath = "FingerImages"
+myList = os.listdir(folderPath)
+overlayList = []
+
+# create mediapipe
+detector = htm.handDetector(detectionCon=0.75)
+
+# hand index
+tipIds = [4, 8, 12, 16, 20]
+
+
+def retrieveFingerImage(path, fingerList):
+    for imgPath in fingerList:
+        image = cv2.imread(f'{path}/{imgPath}')
+
+        overlayList.append(image)
+
+    return overlayList
+
+
+def mobileRealTimeDetection():
+    overlayList = retrieveFingerImage(folderPath, myList)
+
+    thres = 0.45  # Threshold to detect object
+
+    # Start Real Time
+    cap = cv2.VideoCapture(0)
+
+    classNames = []
+    classFile = 'mobileNet/coco.names'
+    with open(classFile, 'rt') as f:
+        classNames = f.read().rstrip('\n').split('\n')
+
+    net = initNet()
+
+    # fps
+    font = cv2.FONT_HERSHEY_PLAIN
+    starting_time = time.time()
+    frame_id = 0
+
+    # Close due to low fps
+    # createWorkBook()
+    #
+    # wb = load_workbook('ObjectDetected.xlsx')
+    # sheet = wb.worksheets[0]
+    # print("Clearing Data")
+    # while sheet.max_row > 1:
+    #     # this method removes the row 2
+    #     sheet.delete_rows(2)
+    #     wb.save('ObjectDetected.xlsx')
+    # print("Data Cleared")
+
+    while True:
+        success, img = cap.read()
+        img = cv2.resize(img, (0, 0), fx=1.05, fy=1.0)
+
+        frame_id += 1
+
+        classIds, confs, bbox = net.detect(img, confThreshold=thres)
+
+        if len(classIds) != 0:
+            for classId, confidence, box in zip(classIds.flatten(), confs.flatten(), bbox):
+                if confidence >= 0.5:
+                    cv2.rectangle(img, box, color=(0, 255, 0), thickness=2)
+
+                    cv2.putText(img, classNames[classId - 1].upper(), (box[0] + 10, box[1] + 30),
+                                cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1)
+
+                    cv2.putText(img, str(round(confidence * 100, 2)), (box[0] + 200, box[1] + 30),
+                                cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1)
+
+                    img = detector.findHands(img)
+                    lmList = detector.findPosition(img, draw=False)
+
+                    if len(lmList) != 0:
+                        fingers = []
+
+                        # thumb
+                        # [index finger][height]
+                        if lmList[tipIds[0]][1] > lmList[tipIds[0] - 1][2] + 100:
+                            fingers.append(1)
+                        else:
+                            fingers.append(0)
+
+                        # 4 fingers
+                        for id in range(1, 5):
+                            # [index finger][height]
+                            if lmList[tipIds[id]][2] < lmList[tipIds[id] - 2][2]:
+                                fingers.append(1)
+                            else:
+                                fingers.append(0)
+
+                        totalFingers = fingers.count(1)
+                        print(totalFingers)
+
+                        h, w, c = overlayList[totalFingers - 1].shape
+                        img[0:h, 0:w] = overlayList[totalFingers - 1]
+
+                    # Close due to low fps
+                    # Append detected object into excel file
+                    # objectDetected = (classNames[classId - 1].capitalize(), round(confidence * 100, 2))
+                    # sheet.append(objectDetected)
+                    # wb.save('ObjectDetected.xlsx')
+
+                elapsed_time = time.time() - starting_time
+                fps = frame_id / elapsed_time
+                cv2.putText(img, "FPS: " + str(round(fps, 2)), (10, 50), font, 2, (0, 0, 0), 3)
+
+                frame = cv2.imencode('.jpg', img)[1].tobytes()
+                yield b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n'
 
 
 def initNet():

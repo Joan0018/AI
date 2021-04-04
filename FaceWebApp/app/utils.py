@@ -701,6 +701,9 @@ def mobileNetVideoDetection(path):
         wb.save('ObjectDetected.xlsx')
     print("Data Cleared")
 
+    # fps
+    prevTime = 0
+
     while cap.isOpened:
         success, img = cap.read()
 
@@ -732,6 +735,12 @@ def mobileNetVideoDetection(path):
                         objectDetected = (classNames[classId - 1].capitalize(), round(confidence * 100, 2))
                         sheet.append(objectDetected)
                         wb.save('ObjectDetected.xlsx')
+
+                currentTime = time.time()
+                fps = 1 / (currentTime - prevTime)
+                prevTime = currentTime
+
+                cv2.putText(img, "FPS: " + str(round(fps, 2)), (10, 50), font, 1, (0, 0, 0), 3)
 
             cv2.imshow("Output", img)
             if cv2.waitKey(1) & 0xFF == ord('s'):  # press s to exit  --#esc key (27),

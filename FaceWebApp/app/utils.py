@@ -815,41 +815,41 @@ def mobileRealTimeDetection():
                     cv2.putText(img, str(round(confidence * 100, 2)), (box[0] + 200, box[1] + 30),
                                 cv2.FONT_HERSHEY_COMPLEX, 1, (0, 255, 0), 1)
 
-                    img = detector.findHands(img)
-                    lmList = detector.findPosition(img, draw=False)
+                    if classNames[classId - 1].upper() == "PERSON":
+                        img = detector.findHands(img)
+                        lmList = detector.findPosition(img, draw=False)
 
-                    if len(lmList) != 0:
-                        fingers = []
+                        if len(lmList) != 0:
+                            fingers = []
 
-                        # thumb
-                        if lmList[5][1] > lmList[17][1]:
-                            #  Right
-                            # [index finger][height]
-                            if lmList[tipIds[0]][1] > lmList[tipIds[0] - 1][2] + 100:
-                                fingers.append(1)
+                            # thumb
+                            if lmList[5][1] > lmList[17][1]:
+                                #  Right
+                                # [index finger][height]
+                                if lmList[tipIds[0]][1] > lmList[tipIds[0] - 1][2] + 100:
+                                    fingers.append(1)
+                                else:
+                                    fingers.append(0)
                             else:
-                                fingers.append(0)
-                        else:
-                            # Left
-                            # [index finger][height]
-                            if lmList[tipIds[0]][1] < lmList[tipIds[0] - 1][2]:
-                                fingers.append(1)
-                            else:
-                                fingers.append(0)
+                                # Left
+                                # [index finger][height]
+                                if lmList[tipIds[0]][1] < lmList[tipIds[0] - 1][2]:
+                                    fingers.append(1)
+                                else:
+                                    fingers.append(0)
 
-                        # 4 fingers
-                        for id in range(1, 5):
-                            # [index finger][height]
-                            if lmList[tipIds[id]][2] < lmList[tipIds[id] - 2][2]:
-                                fingers.append(1)
-                            else:
-                                fingers.append(0)
+                            # 4 fingers
+                            for id in range(1, 5):
+                                # [index finger][height]
+                                if lmList[tipIds[id]][2] < lmList[tipIds[id] - 2][2]:
+                                    fingers.append(1)
+                                else:
+                                    fingers.append(0)
 
-                        totalFingers = fingers.count(1)
-                        print(totalFingers)
+                            totalFingers = fingers.count(1)
 
-                        h, w, c = overlayList[totalFingers - 1].shape
-                        img[0:h, 0:w] = overlayList[totalFingers - 1]
+                            h, w, c = overlayList[totalFingers - 1].shape
+                            img[0:h, 0:w] = overlayList[totalFingers - 1]
 
                     # Close due to low fps
                     # Append detected object into excel file

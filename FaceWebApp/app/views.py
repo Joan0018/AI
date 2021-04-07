@@ -1,8 +1,7 @@
 from flask import render_template, request, Response
 import os
 from PIL import Image
-from app.utils import pipeline_model, mobileNetImageDetection, mobileRealTimeDetection, videoCapture, \
-    genderRealTimeDetection, mobileNetVideoDetection, faceRecognitionImage, faceRecognitionVideo, faceRecognitionReal
+from app.utils import pipeline_model, mobileNetImageDetection, mobileRealTimeDetection,mobileNetVideoDetection, faceRecognitionImage, faceRecognitionVideo, faceRecognitionReal
 
 UPLOAD_FOLDER = 'static/uploads'
 
@@ -31,11 +30,11 @@ def openRealTime():
     return render_template('realTimeDetection.html')
 
 
-def gender_Real():
-    return Response(genderRealTimeDetection(), mimetype='multipart/x-mixed-replace; boundary=frame')
+# def gender_Real():
+#     return Response(genderRealTimeDetection(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-def genderRealTime():
-    return render_template('realTimeGender.html')
+# def genderRealTime():
+#     return render_template('realTimeGender.html')
 
 
 def gender():
@@ -54,19 +53,19 @@ def gender():
     return render_template('gender.html', fileupload=False, img_name="gender.png")
 
 
-def gender_Video():
-    if request.method == "POST":
-        f = request.files['video']
-        filename = f.filename
-        path = os.path.join(UPLOAD_FOLDER, filename)
-        f.save(path)
+# def gender_Video():
+#     if request.method == "POST":
+#         f = request.files['video']
+#         filename = f.filename
+#         path = os.path.join(UPLOAD_FOLDER, filename)
+#         f.save(path)
 
-        # prediction (pass to pipeline model)
-        videoCapture(path, color='bgr')
+#         # prediction (pass to pipeline model)
+#         # videoCapture(path, color='bgr')
 
-        return render_template('genderVideo.html', fileupload=True)
+#         return render_template('genderVideo.html', fileupload=True)
 
-    return render_template('genderVideo.html', fileupload=False, img_name="gender.png")
+#     return render_template('genderVideo.html', fileupload=False, img_name="gender.png")
 
 
 def faceRecognition_Video():

@@ -90,77 +90,6 @@ def pipeline_model(path, filename, color='bgr'):
     cv2.imwrite('./static/predict/{}'.format(filename), img)
 
 
-# Gender Classification (Video)
-def videoCapture(path, color='bgr'):
-    # step-1: read image in cv2
-    cap = cv2.VideoCapture(path)
-
-    while cap.isOpened:
-        ret, frame = cap.read()
-
-        if ret:
-            frame = pipeline_model_video(frame, color='bgr')
-
-            cv2.imshow('Gender Detector', frame)
-            if cv2.waitKey(1) & 0xFF == ord('s'):  # press s to exit  --#esc key (27),
-                break
-        else:
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
-    return
-
-
-def pipeline_model_video(img, color='rgb'):
-    # step-2: convert into gray scale
-    if color == 'bgr':
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    else:
-        gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-
-    # step-3: crop the face (using haar cascase classifier)
-    faces = haar.detectMultiScale(gray, 1.5, 3)
-    for x, y, w, h in faces:
-        cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)  # drawing rectangle
-        roi = gray[y:y + h, x:x + w]  # crop image
-        # step - 4: normalization (0-1)
-        roi = roi / 255.0
-        # step-5: resize images (100,100)
-        if roi.shape[1] > 100:
-            roi_resize = cv2.resize(roi, (100, 100), cv2.INTER_AREA)
-        else:
-            roi_resize = cv2.resize(roi, (100, 100), cv2.INTER_CUBIC)
-        # step-6: Flattening (1x10000)
-        roi_reshape = roi_resize.reshape(1, 10000)  # 1,-1
-        # step-7: subptract with mean
-        roi_mean = roi_reshape - mean
-        # step -8: get eigen image
-        eigen_image = model_pca.transform(roi_mean)
-        # step -9: pass to ml model (svm)
-        results = model_svm.predict_proba(eigen_image)[0]
-        # step -10:
-        predict = results.argmax()  # 0 or 1
-        score = results[predict]
-
-        # step -11:
-        text = "%s : %0.2f" % (gender_pre[predict], score)
-        cv2.putText(img, text, (x, y), font, 1, (255, 255, 0), 1)
-
-    return img
-
-
-def genderRealTimeDetection():
-    cap = cv2.VideoCapture(0)
-    while True:
-        ret, frame = cap.read()
-
-        frame = pipeline_model_video(frame, color='bgr', )
-
-        img = cv2.imencode('.jpg', frame)[1].tobytes()
-        yield b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n'
-
-
 # Face Recognition
 def faceRecognitionImage(path):
     # #loading the image to detect
@@ -248,9 +177,13 @@ def faceRecognitionImage(path):
     the_rock_image = face_recognition.load_image_file('images/New Sample/the-rock.jpg')
     the_rock_encodings = face_recognition.face_encodings(the_rock_image)[0]
 
-    # Face #19
+    # Face #20
     Tom_Holland_image = face_recognition.load_image_file('images/New Sample/Tom_Holland.jpg')
     Tom_Holland_encodings = face_recognition.face_encodings(Tom_Holland_image)[0]
+
+    # Face #21
+    modi_image = face_recognition.load_image_file('images/modi.jpg')
+    modi_encodings = face_recognition.face_encodings(modi_image)[0]
 
     # #save the encodings and the corresponding labels in seperate arrays in the same order
     known_face_encodings = [Benedict_Cumberbatch_face_encodings, Beyonce_face_encodings, lim_face_encodings,
@@ -260,12 +193,12 @@ def faceRecognitionImage(path):
                             Mahershala_Ali_encodings,
                             Paul_Rudd_encodings, Ryan_Reynolds_encodings, Scarlett_Johansson_encodings,
                             Simu_Liu_encodings, taylor_swift_encodings,
-                            the_rock_encodings, Tom_Holland_encodings]
+                            the_rock_encodings, Tom_Holland_encodings, modi_encodings]
     known_face_names = ["Benedict Cumberbatch", "Beyonce", "Lim Kah Yee",
                         "Brie Larson", "Calum Scott", "Chris Hemsworth", "Ed Sheeran", "Evangeline Lilly",
                         "Hailey Rhode Bieber", "Justin Bieber", "Lisa", " Mahershala Ali", "Paul Rudd",
                         "Ryan Reynolds", "Scarlett Johansson", "Simu Liu", "Taylor Swift", "Johnson Dwayne",
-                        "Tom Holland"]
+                        "Tom Holland", "Narendra Modi"]
 
     # #load the unknown image to recognize faces in it
     image_to_recognize = face_recognition.load_image_file(path)
@@ -301,7 +234,7 @@ def faceRecognitionImage(path):
 
 
 def faceRecognitionVideo(path):
-    # capture the video from default camera
+   # capture the video from default camera
     global left_pos, top_pos, right_pos, bottom_pos, name_of_person
     file_video_stream = cv2.VideoCapture(path)
 
@@ -386,9 +319,13 @@ def faceRecognitionVideo(path):
     the_rock_image = face_recognition.load_image_file('images/New Sample/the-rock.jpg')
     the_rock_encodings = face_recognition.face_encodings(the_rock_image)[0]
 
-    # Face #19
+    # Face #20
     Tom_Holland_image = face_recognition.load_image_file('images/New Sample/Tom_Holland.jpg')
     Tom_Holland_encodings = face_recognition.face_encodings(Tom_Holland_image)[0]
+
+    # Face #21
+    modi_image = face_recognition.load_image_file('images/modi.jpg')
+    modi_encodings = face_recognition.face_encodings(modi_image)[0]
 
     # #save the encodings and the corresponding labels in seperate arrays in the same order
     known_face_encodings = [Benedict_Cumberbatch_face_encodings, Beyonce_face_encodings, lim_face_encodings,
@@ -398,12 +335,12 @@ def faceRecognitionVideo(path):
                             Mahershala_Ali_encodings,
                             Paul_Rudd_encodings, Ryan_Reynolds_encodings, Scarlett_Johansson_encodings,
                             Simu_Liu_encodings, taylor_swift_encodings,
-                            the_rock_encodings, Tom_Holland_encodings]
+                            the_rock_encodings, Tom_Holland_encodings, modi_encodings]
     known_face_names = ["Benedict Cumberbatch", "Beyonce", "Lim Kah Yee",
                         "Brie Larson", "Calum Scott", "Chris Hemsworth", "Ed Sheeran", "Evangeline Lilly",
                         "Hailey Rhode Bieber", "Justin Bieber", "Lisa", " Mahershala Ali", "Paul Rudd",
                         "Ryan Reynolds", "Scarlett Johansson", "Simu Liu", "Taylor Swift", "Johnson Dwayne",
-                        "Tom Holland"]
+                        "Tom Holland", "Narendra Modi"]
 
     # initialize the array variable to hold all face locations, encodings and names
     all_face_locations = []
@@ -416,6 +353,12 @@ def faceRecognitionVideo(path):
         ret, current_frame = file_video_stream.read()
 
         if ret:
+            #Gender Classification
+            gray = cv2.cvtColor(current_frame, cv2.COLOR_RGB2GRAY)
+
+            # step-3: crop the face (using haar cascase classifier)
+            faces = haar.detectMultiScale(gray, 1.5, 3)
+            
             # resize the current frame to 1/4 size to proces faster
             current_frame_small = cv2.resize(current_frame, (0, 0), fx=0.25, fy=0.25)
             # detect all faces in the image
@@ -431,6 +374,29 @@ def faceRecognitionVideo(path):
                 # splitting the tuple to get the four position values of current face
                 top_pos, right_pos, bottom_pos, left_pos = current_face_location
 
+                for x, y, w, h in faces:
+                    roi = gray[y:y + h, x:x + w]  # crop image
+                    # step - 4: normalization (0-1)
+                    roi = roi / 255.0
+                    # step-5: resize images (100,100)
+                    if roi.shape[1] > 100:
+                        roi_resize = cv2.resize(roi, (100, 100), cv2.INTER_AREA)
+                    else:
+                        roi_resize = cv2.resize(roi, (100, 100), cv2.INTER_CUBIC)
+                    # step-6: Flattening (1x10000)
+                    roi_reshape = roi_resize.reshape(1, 10000)  # 1,-1
+                    # step-7: subptract with mean
+                    roi_mean = roi_reshape - mean
+                    # step -8: get eigen image
+                    eigen_image = model_pca.transform(roi_mean)
+                    # step -9: pass to ml model (svm)
+                    results = model_svm.predict_proba(eigen_image)[0]
+                    # step -10:
+                    pre = results.argmax()  # 0 or 1
+                    score = results[pre]
+
+                    textPreGender = "%s : %0.2f" % (gender_pre[pre], score)
+                    cv2.putText(current_frame, textPreGender, (x, y), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 0), 2)
                 # change the position maginitude to fit the actual size video frame
                 top_pos = top_pos * 4
                 right_pos = right_pos * 4
@@ -454,7 +420,8 @@ def faceRecognitionVideo(path):
 
                 # display the name as text in the image
                 font = cv2.FONT_HERSHEY_DUPLEX
-                cv2.putText(current_frame, name_of_person, (left_pos, bottom_pos), font, 1, (255, 255, 0), 1)
+                
+                cv2.putText(current_frame, name_of_person, (left_pos, bottom_pos), font, 1, (255, 255, 0), 2, cv2.LINE_AA)
 
             # display the video
             cv2.imshow("Webcam Video", current_frame)
@@ -468,6 +435,7 @@ def faceRecognitionVideo(path):
     # close all opencv windows open
     file_video_stream.release()
     cv2.destroyAllWindows()
+
 
 
 def faceRecognitionReal():
@@ -554,9 +522,13 @@ def faceRecognitionReal():
     the_rock_image = face_recognition.load_image_file('images/New Sample/the-rock.jpg')
     the_rock_encodings = face_recognition.face_encodings(the_rock_image)[0]
 
-    # Face #19
+    # Face #20
     Tom_Holland_image = face_recognition.load_image_file('images/New Sample/Tom_Holland.jpg')
     Tom_Holland_encodings = face_recognition.face_encodings(Tom_Holland_image)[0]
+
+    # Face #21
+    modi_image = face_recognition.load_image_file('images/modi.jpg')
+    modi_encodings = face_recognition.face_encodings(modi_image)[0]
 
     # #save the encodings and the corresponding labels in seperate arrays in the same order
     known_face_encodings = [Benedict_Cumberbatch_face_encodings, Beyonce_face_encodings, lim_face_encodings,
@@ -566,12 +538,12 @@ def faceRecognitionReal():
                             Mahershala_Ali_encodings,
                             Paul_Rudd_encodings, Ryan_Reynolds_encodings, Scarlett_Johansson_encodings,
                             Simu_Liu_encodings, taylor_swift_encodings,
-                            the_rock_encodings, Tom_Holland_encodings]
+                            the_rock_encodings, Tom_Holland_encodings, modi_encodings]
     known_face_names = ["Benedict Cumberbatch", "Beyonce", "Lim Kah Yee",
                         "Brie Larson", "Calum Scott", "Chris Hemsworth", "Ed Sheeran", "Evangeline Lilly",
                         "Hailey Rhode Bieber", "Justin Bieber", "Lisa", " Mahershala Ali", "Paul Rudd",
                         "Ryan Reynolds", "Scarlett Johansson", "Simu Liu", "Taylor Swift", "Johnson Dwayne",
-                        "Tom Holland"]
+                        "Tom Holland", "Narendra Modi"]
 
     # initialize the array variable to hold all face locations, encodings and names
     all_face_locations = []
@@ -582,6 +554,13 @@ def faceRecognitionReal():
     while True:
         # get the current frame from the video stream as an image
         ret, current_frame = webcam_video_stream.read()
+
+        #Gender Classification
+        gray = cv2.cvtColor(current_frame, cv2.COLOR_RGB2GRAY)
+
+        # step-3: crop the face (using haar cascase classifier)
+        faces = haar.detectMultiScale(gray, 1.5, 3)
+
         # resize the current frame to 1/4 size to proces faster
         current_frame_small = cv2.resize(current_frame, (0, 0), fx=0.25, fy=0.25)
         # detect all faces in the image
@@ -594,6 +573,30 @@ def faceRecognitionReal():
 
         # looping through the face locations and the face embeddings
         for current_face_location, current_face_encoding in zip(all_face_locations, all_face_encodings):
+
+            for x, y, w, h in faces:
+                roi = gray[y:y + h, x:x + w]  # crop image
+                # step - 4: normalization (0-1)
+                roi = roi / 255.0
+                # step-5: resize images (100,100)
+                if roi.shape[1] > 100:
+                    roi_resize = cv2.resize(roi, (100, 100), cv2.INTER_AREA)
+                else:
+                    roi_resize = cv2.resize(roi, (100, 100), cv2.INTER_CUBIC)
+                # step-6: Flattening (1x10000)
+                roi_reshape = roi_resize.reshape(1, 10000)  # 1,-1
+                # step-7: subptract with mean
+                roi_mean = roi_reshape - mean
+                # step -8: get eigen image
+                eigen_image = model_pca.transform(roi_mean)
+                # step -9: pass to ml model (svm)
+                results = model_svm.predict_proba(eigen_image)[0]
+                # step -10:
+                pre = results.argmax()  # 0 or 1
+                score = results[pre]
+
+                textPreGender = "%s : %0.2f" % (gender_pre[pre], score)
+                cv2.putText(current_frame, textPreGender, (x, y), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 0), 2)
             # splitting the tuple to get the four position values of current face
             top_pos, right_pos, bottom_pos, left_pos = current_face_location
 

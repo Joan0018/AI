@@ -42,25 +42,16 @@
                 </li>
                 <li class="nav-item dropdown">
                   <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Gender Classification
+                    Face Recognition
                   </a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                     <a class="dropdown-item" href="{{ url_for('gender') }}">Upload Image</a>
-                   <a class="dropdown-item" href="{{ url_for('gender_Video') }}">Upload Video</a>
-                    <a class="dropdown-item" href="{{ url_for('openGenderRealTime') }}">Real Time Detection</a>
+                    <a class="dropdown-item" href="{{ url_for('faceRecognitionVideo') }}">Upload Video</a>
+                    <a class="dropdown-item" href="{{ url_for('faceRecognitionReal') }}">Real Time Detection</a>
                   </div>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Face Recognition
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                 <a class="dropdown-item" href="{{ url_for('faceRecognitionVideo') }}">Upload Video</a>
-                  <a class="dropdown-item" href="{{ url_for('faceRecognitionReal') }}">Real Time Detection</a>
-                </div>
-            </li>
-            </ul>
-          </div>
+                </li>
+              </ul>
+            </div>
       </nav>
     </div>
 
